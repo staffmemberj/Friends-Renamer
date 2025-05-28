@@ -17,7 +17,6 @@ readline.parse_and_bind('tab: complete')
 
 # --- Load Rename Map ---
 def load_rename_map(map_file):
-    rename_map = {}
     structured_map = {}
     pattern = re.compile(r"^(S\d{2}E\d{2,3})-(Friends_Season_\d+_Disc_\d+_t\d+\.mkv)")
 
@@ -49,14 +48,27 @@ def main():
         return
 
     season = input("📦 Enter the season number (e.g., 2): ").strip().zfill(2)
-    disc = input("💿 Enter the disc number (e.g., 2): ").strip()
+    season_key = f"S{season}"
 
     structured_map = load_rename_map("friends_map.txt")
-    season_key = f"S{season}"
+
+    if season_key not in structured_map:
+        print(f"\n❌ Season {season} is not in the mapping.")
+        return
+
+    # Show available discs with episode ranges
+    print(f"\n💿 Available discs for Season {season}:")
+    for disc_key in sorted(structured_map[season_key].keys()):
+        files = structured_map[season_key][disc_key]
+        eps = [re.search(r'S\d{2}E(\d{2,3})', new).group(1) for new in files.values()]
+        eps_range = f"Episodes {min(eps)}–{max(eps)}" if eps else "No episodes"
+        print(f"  - Disc {disc_key[-1]}: {eps_range}")
+
+    disc = input("\n📥 Enter the disc number from the list above (just the number): ").strip()
     disc_key = f"D{disc}"
 
-    if season_key not in structured_map or disc_key not in structured_map[season_key]:
-        print(f"\n❌ No mapping found for Season {season} Disc {disc}.")
+    if disc_key not in structured_map[season_key]:
+        print(f"\n❌ Disc {disc} is not valid for Season {season}.")
         return
 
     rename_map = structured_map[season_key][disc_key]
