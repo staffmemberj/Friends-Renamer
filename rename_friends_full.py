@@ -83,18 +83,13 @@ def main():
             old_path = os.path.join(folder, old)
             new_path = os.path.join(folder, new)
             if os.path.exists(old_path):
+                print(f"Renaming: {old} ➜ {new}")
                 os.rename(old_path, new_path)
                 renamed.add(new)
                 log.write(f"✅ Renamed: {old} ➜ {new}\n")
             else:
+                print(f"⚠️ File not found: {old}")
                 log.write(f"⚠️ Missing: {old}\n")
-
-        for fname in os.listdir(folder):
-            if fname.endswith(".mkv") and fname not in renamed:
-                os.remove(os.path.join(folder, fname))
-                log.write(f"🗑️ Deleted: {fname}\n")
-
-        log.write("\n✅ Finished.\n")
 
     print(f"\n✅ Done! Log saved to: {log_path}")
 
